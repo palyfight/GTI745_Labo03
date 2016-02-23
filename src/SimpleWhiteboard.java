@@ -27,9 +27,9 @@ class Stroke {
 	// the points that make up the stroke, in world space coordinates
 	private ArrayList< Point2D > points = new ArrayList< Point2D >();
 
-	private float color_red = 0;
-	private float color_green = 0;
-	private float color_blue = 0;
+	public float color_red = 0;
+	public float color_green = 0;
+	public float color_blue = 0;
 
 	private AlignedRectangle2D boundingRectangle = new AlignedRectangle2D();
 	private boolean isBoundingRectangleDirty = false;
@@ -47,7 +47,7 @@ class Stroke {
 		color_green = g;
 		color_blue = b;
 	}
-
+	
 	public AlignedRectangle2D getBoundingRectangle() {
 		if ( isBoundingRectangleDirty ) {
 			boundingRectangle.clear();
@@ -724,6 +724,10 @@ class UserContext {
 						// Frame the entire drawing
 						gw.frame( drawing.getBoundingRectangle(), true );
 					}
+					else if( indexOfButton == palette.sendSVG_buttonIndex){
+						CreateSVG svg = new CreateSVG();
+						svg.writeToSVGFile(drawing.strokes);
+					}
 					else {
 						// The event occurred on some part of the palette where there are no buttons.
 						// We cause a new cursor to be created to keep track of this event id in the future.
@@ -1010,6 +1014,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 	JButton testButton1;
 	JButton testButton2;
 	SVGGraphics2D svgGraph;
+	CreateSVG svg;
 
 	Thread thread = null;
 	boolean threadSuspended;
@@ -1049,6 +1054,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 
 		gw.frame( new AlignedRectangle2D( new Point2D(-100,-100), new Point2D(100,100) ), true );
 
+		svg = new CreateSVG();
 		CreateSVG cs = new CreateSVG();
 		svgGraph = cs.getSVGGenerator();
 	}
@@ -1157,7 +1163,6 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.enableAlphaBlending();
 
 		drawing.draw( gw );
-		svgGraph.draw( gw );
 		
 		gw.setCoordinateSystemToPixels();
 
