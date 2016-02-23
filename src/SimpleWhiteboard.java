@@ -1,6 +1,6 @@
 
 import java.util.ArrayList;
-
+import java.util.Stack;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -19,7 +19,7 @@ import javax.swing.BoxLayout;
 
 
 // This stores a polygonal line, creating by a stroke of the user's finger or pen.
-class Stroke {
+class Stroke implements Cloneable{
 	// the points that make up the stroke, in world space coordinates
 	private ArrayList< Point2D > points = new ArrayList< Point2D >();
 
@@ -73,6 +73,15 @@ class Stroke {
 		gw.setColor( color_red, color_green, color_blue );
 		gw.drawPolyline( points );
 	}
+	
+	public Stroke clone(){
+		try {
+			return (Stroke)super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
 
 
@@ -82,7 +91,7 @@ class Stroke {
 class Drawing {
 
 	public ArrayList< Stroke > strokes = new ArrayList< Stroke >();
-
+	
 	private AlignedRectangle2D boundingRectangle = new AlignedRectangle2D();
 	private boolean isBoundingRectangleDirty = false;
 
@@ -111,6 +120,30 @@ class Drawing {
 			s.draw( gw );
 		}
 		gw.setLineWidth( 1 );
+	}
+	
+	public Memento saveToMemento(){
+		  ArrayList< Stroke > temp =  new ArrayList<Stroke>();
+		  for(Stroke s: strokes){
+			  temp.add((Stroke)s.clone());
+		  }
+	       return new Memento(temp);
+	}
+	
+	 public void undo(Memento memento) {
+	        this.strokes = memento.getSavedState();
+	 }
+	
+	public static class Memento{
+		private final ArrayList< Stroke > state;
+		
+		public Memento(ArrayList< Stroke > saved){
+			state = saved;
+		}
+		
+		public ArrayList< Stroke > getSavedState(){
+			return state;
+		}
 	}
 
 }
@@ -493,6 +526,8 @@ class Palette {
 class UserContext {
 	private Palette palette = new Palette();
 	private CursorContainer cursorContainer = new CursorContainer();
+	private Stack<Drawing.Memento> doStack = new Stack<Drawing.Memento>();
+	private Stack<Drawing.Memento> undoStack = new Stack<Drawing.Memento>();
 	private Drawing drawing = null;
 
 	private ArrayList< Stroke > selectedStrokes = new ArrayList< Stroke >();
@@ -606,9 +641,7 @@ class UserContext {
 		int cursorIndex = cursorContainer.findIndexOfCursorById( id );
 		MyCursor cursor = (cursorIndex==-1) ? null : cursorContainer.getCursorByIndex( cursorIndex );
 
-
 		if ( cursor == null ) {
-
 			if ( type == MultitouchFramework.TOUCH_EVENT_UP ) {
 				// This should never happen, but if it does, just ignore the event.
 				return false;
@@ -714,6 +747,20 @@ class UserContext {
 
 						// Frame the entire drawing
 						gw.frame( drawing.getBoundingRectangle(), true );
+					}
+					else if( indexOfButton == palette.undo_buttonIndex){
+						if(!doStack.isEmpty()){
+							Drawing.Memento state = doStack.pop();
+							drawing.undo(state);
+							undoStack.push(state);
+						}
+					}
+					else if(indexOfButton == palette.redo_buttonIndex){
+						if(!undoStack.isEmpty()){
+							Drawing.Memento state = undoStack.pop();
+							drawing.undo(state);
+							doStack.push(state);
+						}
 					}
 					else {
 						// The event occurred on some part of the palette where there are no buttons.
@@ -853,8 +900,13 @@ class UserContext {
 					for ( Point2D p : cursor.getPositions() ) {
 						newStroke.addPoint( gw.convertPixelsToWorldSpaceUnits( p ) );
 					}
-					drawing.addStroke( newStroke );
 
+					doStack.push(drawing.saveToMemento());
+					drawing.addStroke( newStroke );
+					if(!undoStack.isEmpty()){
+						undoStack.clear();
+					}
+					undoStack.push(drawing.saveToMemento());
 					cursorContainer.removeCursorByIndex( cursorIndex );
 				}
 				else {
