@@ -17,10 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 
 //imports for svg generation using apache's svg toolkit (batik)
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.dom.GenericDOMImplementation;
 
 
 
@@ -376,6 +373,7 @@ class Palette {
 	public int frameAll_buttonIndex;
 	public int undo_buttonIndex;
 	public int redo_buttonIndex;
+	public int sendSVG_buttonIndex;
 	
 
 
@@ -418,7 +416,11 @@ class Palette {
 		b = new PaletteButton(5*W,0,"Undo","Undo the modification.", false);
 		undo_buttonIndex = buttons.size();
 		buttons.add(b);
-
+		
+		b = new PaletteButton(6*W,0,"SendSVG","Send an SVG of the current drawn images.", false);
+		sendSVG_buttonIndex = buttons.size();
+		buttons.add(b);
+		
 
 		// Create second row of buttons
 
@@ -1007,6 +1009,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 	JButton frameAllButton;
 	JButton testButton1;
 	JButton testButton2;
+	SVGGraphics2D svgGraph;
 
 	Thread thread = null;
 	boolean threadSuspended;
@@ -1045,6 +1048,9 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.setFontHeight( Constant.TEXT_HEIGHT );
 
 		gw.frame( new AlignedRectangle2D( new Point2D(-100,-100), new Point2D(100,100) ), true );
+
+		CreateSVG cs = new CreateSVG();
+		svgGraph = cs.getSVGGenerator();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -1142,7 +1148,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		catch (InterruptedException e) { }
 	}
 
-	public synchronized void draw() {
+	public synchronized void draw() {		
 		gw.clear(1,1,1);
 		gw.setColor(0,0,0);
 		gw.setupForDrawing();
@@ -1151,14 +1157,13 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.enableAlphaBlending();
 
 		drawing.draw( gw );
-
+		svgGraph.draw( gw );
+		
 		gw.setCoordinateSystemToPixels();
 
 		for ( int j = 0; j < Constant.NUM_USERS; ++j ) {
 			userContexts[j].draw(gw);
 		}
-
-
 		// Draw some text to indicate the number of fingers touching the user interface.
 		// This is useful for debugging.
 		int totalNumCursors = 0;

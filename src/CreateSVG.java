@@ -1,29 +1,45 @@
+/**
+ * Based on an example found here: https://xmlgraphics.apache.org/batik/using/svg-generator.html
+ */
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2DIOException;
+
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+
+import org.apache.batik.dom.GenericDOMImplementation;
+
 
 public class CreateSVG {
-	private String header = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n"+
-							"<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\n"+
-							"\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n"+
-							"<svg xmlns=\"http://www.w3.org/2000/svg\"\n"+
-							"xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\"\n";
+	DOMImplementation domImp;
+	String svgNS;
+	SVGGraphics2D svgGen;
+	Document doc;
 	
-	public CreateSVG(int w, int h) {
-		setSVGWidthAndHeight(w, h);
-		header += "zoomAndPan=\"disable\" preserveAspectRatio=\"none\" >\n";
-		fillSvgData();
-		header += "</svg>";
-		writeToSVGFile();
+	public CreateSVG(){
+		domImp = GenericDOMImplementation.getDOMImplementation();
+		svgNS = "http://www.w3.org/2000/svg";
+		doc = domImp.createDocument(svgNS, "svg", null);
+		svgGen = new SVGGraphics2D(doc);
 	}
 	
-	private void setSVGWidthAndHeight(int width, int height){
-		header += "width=\"" + width + "px\" height=\""+ height + "px\"\n"+
-				  "viewBox=\"0 0 " + width + " " + height + "\"\n";		
+	public SVGGraphics2D getSVGGenerator(){
+		return svgGen;
 	}
 	
-	private void fillSvgData(){
-		
-	}
-	
-	private void writeToSVGFile(){
-		
+	public void writeToSVGFile(){
+		try {
+			Writer out = new OutputStreamWriter(System.out, "UTF-8");
+			svgGen.stream(out, true);
+		} catch (SVGGraphics2DIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
