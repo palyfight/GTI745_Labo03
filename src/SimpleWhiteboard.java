@@ -295,8 +295,8 @@ class CursorContainer {
 
 
 class PaletteButton {
-	public static final int width = Constant.BUTTON_WIDTH; // in pixels
-	public static final int height = Constant.BUTTON_HEIGHT; // in pixels
+	public static int width = Constant.BUTTON_WIDTH; // in pixels
+	public static int height = Constant.BUTTON_HEIGHT; // in pixels
 	public int x0, y0; // coordinates of upper left corner of button, in pixels, with respect to the upper left corner of the palette that contains us
 	String label = "";
 	String tooltip = "";
@@ -325,8 +325,8 @@ class PaletteButton {
 
 	public void draw(
 		int palette_x, int palette_y, // upper left corner of the palette that contains us, in pixels
-		GraphicsWrapper gw
-	) {
+		GraphicsWrapper gw) 
+	{
 		// draw background
 		if ( isPressed ) {
 			gw.setColor( 0, 0, 0, Palette.alpha );
@@ -343,6 +343,7 @@ class PaletteButton {
 		}
 		// draw text label
 		int stringWidth = Math.round( gw.stringWidth( label ) );
+		System.out.print(label);
 		gw.drawString( palette_x + x0+(width-stringWidth)/2, palette_y + y0+height/2+Constant.TEXT_HEIGHT/2, label );
 	}
 }
@@ -351,7 +352,7 @@ class Palette {
 	public int width, height; // in pixels
 	public int x0, y0; // in pixels
 	public static final float alpha = 0.3f; // if between 0 and 1, the palette is drawn semi-transparent
-
+	
 	public ArrayList< PaletteButton > buttons = null;
 
 	// These variables are initialized in the contructor,
@@ -369,6 +370,8 @@ class Palette {
 	public int frameAll_buttonIndex;
 	public int undo_buttonIndex;
 	public int redo_buttonIndex;
+	public int increase_buttonIndex;
+	public int reduce_buttonIndex;
 	
 
 
@@ -379,6 +382,8 @@ class Palette {
 	public float current_green = 0;
 	public float current_blue = 0;
 
+	public boolean enableDraw = true;
+	
 	public Palette() {
 		final int W = PaletteButton.width;
 		final int H = PaletteButton.height;
@@ -388,56 +393,65 @@ class Palette {
 
 		// Create first row of buttons
 
-		b = new PaletteButton(   0, 0, "Move", "Drag on this button to move the palette.", false );
+		b = new PaletteButton(0 ,0,"+","Increase palette size.", true);
+		increase_buttonIndex = buttons.size();
+		buttons.add(b);
+
+		b = new PaletteButton(W, 0, "Move", "Drag on this button to move the palette.", false );
 		movePalette_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton(   W, 0, "Ink", "When active, use other fingers to draw ink strokes.", true );
+		b = new PaletteButton(2*W, 0, "Ink", "When active, use other fingers to draw ink strokes.", true );
 		ink_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 2*W, 0, "Select", "When active, use another finger to select strokes.", true );
+		b = new PaletteButton(3*W, 0, "Select", "When active, use another finger to select strokes.", true );
 		select_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 3*W, 0, "Manip.", "When active, use one or two other fingers to directly manipulate the selection.", true );
+		b = new PaletteButton(4*W, 0, "Manip.", "When active, use one or two other fingers to directly manipulate the selection.", true );
 		manipulate_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 4*W, 0, "Camera", "When active, use one or two other fingers to directly manipulate the camera.", true );
+		b = new PaletteButton(5*W, 0, "Camera", "When active, use one or two other fingers to directly manipulate the camera.", true );
 		camera_buttonIndex = buttons.size();
 		buttons.add( b );
 		
-		b = new PaletteButton(5*W,0,"Undo","Undo the modification.", false);
+		b = new PaletteButton(6*W, 0,"Undo","Undo the modification.", false);
 		undo_buttonIndex = buttons.size();
 		buttons.add(b);
-
+		
 
 		// Create second row of buttons
-
-		b = new PaletteButton(   0, H, "Black", "Changes ink color.", true );
+		
+		b = new PaletteButton(0, H,"-","Reduce palette size", true);
+		reduce_buttonIndex = buttons.size();
+		buttons.add(b);
+		
+		b = new PaletteButton(W, H, "Black", "Changes ink color.", true );
 		black_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton(   W, H, "Red", "Changes ink color.", true );
+		b = new PaletteButton(2*W, H, "Red", "Changes ink color.", true );
 		red_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 2*W, H, "Green", "Changes ink color.", true );
+		b = new PaletteButton(3*W, H, "Green", "Changes ink color.", true );
 		green_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 3*W, H, "Hor. Flip", "Flip the selection horizontally (around a vertical axis).", false );
+		b = new PaletteButton(4*W, H, "Hor. Flip", "Flip the selection horizontally (around a vertical axis).", false );
 		horizFlip_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton( 4*W, H, "Frame all", "Frames the entire drawing.", false );
+		b = new PaletteButton(5*W, H, "Frame all", "Frames the entire drawing.", false );
 		frameAll_buttonIndex = buttons.size();
 		buttons.add( b );
 
-		b = new PaletteButton(5*W,H,"Redo","Redo the last undo", false);
+		b = new PaletteButton(6*W,H,"Redo","Redo the last undo", false);
 		redo_buttonIndex = buttons.size();
 		buttons.add(b);
+		
 
 		// Initialize remaining state
 
@@ -476,14 +490,21 @@ class Palette {
 		}
 		return -1;
 	}
-
+			
 	public void draw( GraphicsWrapper gw ) {
 		// draw border
 		gw.setColor( 0, 0, 0 );
 		gw.drawRect( x0, y0, width, height );
-
-		for ( PaletteButton b : buttons ) {
-			b.draw( x0, y0, gw );
+		
+		if(enableDraw){
+			for ( PaletteButton b : buttons )
+				b.draw( x0, y0, gw );
+		}
+		else{
+			for ( PaletteButton b : buttons ) {
+				if(b.x0 % 7 == 0)
+					b.draw( x0, y0, gw );	
+			}
 		}
 	}
 }
@@ -606,7 +627,6 @@ class UserContext {
 		int cursorIndex = cursorContainer.findIndexOfCursorById( id );
 		MyCursor cursor = (cursorIndex==-1) ? null : cursorContainer.getCursorByIndex( cursorIndex );
 
-
 		if ( cursor == null ) {
 
 			if ( type == MultitouchFramework.TOUCH_EVENT_UP ) {
@@ -629,6 +649,7 @@ class UserContext {
 					// We branch according to the button under the event.
 					//
 					int indexOfButton = palette.indexOfButtonContainingTheGivenPoint( x, y );
+
 					if (
 						indexOfButton == palette.movePalette_buttonIndex
 					) {
@@ -714,6 +735,14 @@ class UserContext {
 
 						// Frame the entire drawing
 						gw.frame( drawing.getBoundingRectangle(), true );
+					}
+					else if( indexOfButton == palette.reduce_buttonIndex ){
+						this.palette.enableDraw = false;
+						this.palette.width = Constant.BUTTON_WIDTH;
+					}
+					else if( indexOfButton == palette.increase_buttonIndex ){
+						this.palette.enableDraw = true;
+						this.palette.width = Constant.BUTTON_WIDTH * 7;
 					}
 					else {
 						// The event occurred on some part of the palette where there are no buttons.
