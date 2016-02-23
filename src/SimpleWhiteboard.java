@@ -16,6 +16,13 @@ import javax.swing.JPanel;
 //import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 
+//imports for svg generation using apache's svg toolkit (batik)
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+
+
 
 
 // This stores a polygonal line, creating by a stroke of the user's finger or pen.

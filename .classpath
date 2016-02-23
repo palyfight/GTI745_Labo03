@@ -13,5 +13,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GTI745_Labo03/lib/jogl-1.1.1-windows-amd64/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/batik/batik-dom-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-svg-dom-1.8.jar"/>
+	<classpathentry kind="lib" path="lib/batik/batik-svggen-1.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
