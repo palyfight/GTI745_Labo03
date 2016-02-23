@@ -5,12 +5,12 @@
 	<classpathentry kind="lib" path="lib/JWinPointer.jar"/>
 	<classpathentry kind="lib" path="lib/jogl-1.1.1-windows-amd64/lib/gluegen-rt.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="E:/GTI745/GTI745_Labo03/lib/jogl-1.1.1-windows-amd64/lib"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GTI745_Labo03/lib/jogl-1.1.1-windows-amd64/lib"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jogl-1.1.1-windows-amd64/lib/jogl.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="E:/GTI745/GTI745_Labo03/lib/jogl-1.1.1-windows-amd64/lib"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GTI745_Labo03/lib/jogl-1.1.1-windows-amd64/lib"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
