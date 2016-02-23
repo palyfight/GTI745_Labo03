@@ -367,6 +367,9 @@ class Palette {
 	public int green_buttonIndex;
 	public int horizFlip_buttonIndex;
 	public int frameAll_buttonIndex;
+	public int undo_buttonIndex;
+	public int redo_buttonIndex;
+	
 
 
 	public int currentlyActiveModalButton; // could be equal to any of ink_buttonIndex, select_buttonIndex, manipulate_buttonIndex, camera_buttonIndex
@@ -404,6 +407,10 @@ class Palette {
 		b = new PaletteButton( 4*W, 0, "Camera", "When active, use one or two other fingers to directly manipulate the camera.", true );
 		camera_buttonIndex = buttons.size();
 		buttons.add( b );
+		
+		b = new PaletteButton(5*W,0,"Undo","Undo the modification.", false);
+		undo_buttonIndex = buttons.size();
+		buttons.add(b);
 
 
 		// Create second row of buttons
@@ -428,6 +435,9 @@ class Palette {
 		frameAll_buttonIndex = buttons.size();
 		buttons.add( b );
 
+		b = new PaletteButton(5*W,H,"Redo","Redo the last undo", false);
+		redo_buttonIndex = buttons.size();
+		buttons.add(b);
 
 		// Initialize remaining state
 
@@ -490,10 +500,15 @@ class UserContext {
 	public UserContext( Drawing d ) {
 		drawing = d;
 	}
+	
+	public int getPaletteWith(){
+		return palette.width; 
+	}
 
 	public void setPositionOfCenterOfPalette( float x, float y ) {
-		palette.x0 = Math.round( x - palette.width/2 );
-		palette.y0 = Math.round( y - palette.height/2 );
+		
+		palette.x0 = Math.round( x - palette.width/2);
+		palette.y0 = Math.round( y - palette.height/2);
 	}
 	public void movePalette(
 		float delta_x, float delta_y // displacement, in pixels
@@ -1014,7 +1029,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 			for ( int j = 0; j < Constant.NUM_USERS; ++j ) {
 				float angleInRadians = (float)( 2 * Math.PI * j / Constant.NUM_USERS );
 				userContexts[j].setPositionOfCenterOfPalette(
-					Constant.INITIAL_WINDOW_WIDTH / 2 + (float)(radius*Math.cos(angleInRadians)),
+					(Constant.INITIAL_WINDOW_WIDTH /8 + ((Constant.INITIAL_WINDOW_WIDTH * j)/2)) + (userContexts[j].getPaletteWith()/4) , //+ (float)(radius*Math.cos(angleInRadians))
 					Constant.INITIAL_WINDOW_HEIGHT / 2 + (float)(radius*Math.sin(angleInRadians))
 				);
 			}
