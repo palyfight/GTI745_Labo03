@@ -16,11 +16,6 @@ import javax.swing.JPanel;
 //import javax.swing.SwingUtilities;
 import javax.swing.BoxLayout;
 
-//imports for svg generation using apache's svg toolkit (batik)
-import org.apache.batik.svggen.SVGGraphics2D;
-
-
-
 
 // This stores a polygonal line, creating by a stroke of the user's finger or pen.
 class Stroke {
@@ -727,6 +722,7 @@ class UserContext {
 					else if( indexOfButton == palette.sendSVG_buttonIndex){
 						CreateSVG svg = new CreateSVG();
 						svg.writeToSVGFile(drawing.strokes);
+						svg.sendSVG();
 					}
 					else {
 						// The event occurred on some part of the palette where there are no buttons.
@@ -1013,7 +1009,6 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 	JButton frameAllButton;
 	JButton testButton1;
 	JButton testButton2;
-	SVGGraphics2D svgGraph;
 	CreateSVG svg;
 
 	Thread thread = null;
@@ -1055,8 +1050,6 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.frame( new AlignedRectangle2D( new Point2D(-100,-100), new Point2D(100,100) ), true );
 
 		svg = new CreateSVG();
-		CreateSVG cs = new CreateSVG();
-		svgGraph = cs.getSVGGenerator();
 	}
 
 	public void actionPerformed(ActionEvent e) {
