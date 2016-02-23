@@ -17,15 +17,14 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 
 
-
 // This stores a polygonal line, creating by a stroke of the user's finger or pen.
 class Stroke implements Cloneable{
 	// the points that make up the stroke, in world space coordinates
 	private ArrayList< Point2D > points = new ArrayList< Point2D >();
 
-	private float color_red = 0;
-	private float color_green = 0;
-	private float color_blue = 0;
+	public float color_red = 0;
+	public float color_green = 0;
+	public float color_blue = 0;
 
 	private AlignedRectangle2D boundingRectangle = new AlignedRectangle2D();
 	private boolean isBoundingRectangleDirty = false;
@@ -43,7 +42,7 @@ class Stroke implements Cloneable{
 		color_green = g;
 		color_blue = b;
 	}
-
+	
 	public AlignedRectangle2D getBoundingRectangle() {
 		if ( isBoundingRectangleDirty ) {
 			boundingRectangle.clear();
@@ -403,6 +402,7 @@ class Palette {
 	public int frameAll_buttonIndex;
 	public int undo_buttonIndex;
 	public int redo_buttonIndex;
+	public int sendSVG_buttonIndex;
 	public int increase_buttonIndex;
 	public int reduce_buttonIndex;
 	
@@ -453,7 +453,10 @@ class Palette {
 		b = new PaletteButton(6*W, 0,"Undo","Undo the modification.", false);
 		undo_buttonIndex = buttons.size();
 		buttons.add(b);
-		
+
+		b = new PaletteButton(7*W,0,"SendSVG","Send an SVG of the current drawn images.", false);
+		sendSVG_buttonIndex = buttons.size();
+		buttons.add(b);
 
 		// Create second row of buttons
 		
@@ -770,6 +773,11 @@ class UserContext {
 						// Frame the entire drawing
 						gw.frame( drawing.getBoundingRectangle(), true );
 					}
+					else if( indexOfButton == palette.sendSVG_buttonIndex){
+						CreateSVG svg = new CreateSVG();
+						svg.writeToSVGFile(drawing.strokes);
+						svg.sendSVG();
+					}
 					else if( indexOfButton == palette.reduce_buttonIndex ){
 						this.palette.enableDraw = false;
 						this.palette.width = Constant.BUTTON_WIDTH;
@@ -1082,6 +1090,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 	JButton frameAllButton;
 	JButton testButton1;
 	JButton testButton2;
+	CreateSVG svg;
 
 	Thread thread = null;
 	boolean threadSuspended;
@@ -1120,6 +1129,8 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.setFontHeight( Constant.TEXT_HEIGHT );
 
 		gw.frame( new AlignedRectangle2D( new Point2D(-100,-100), new Point2D(100,100) ), true );
+
+		svg = new CreateSVG();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -1217,7 +1228,7 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		catch (InterruptedException e) { }
 	}
 
-	public synchronized void draw() {
+	public synchronized void draw() {		
 		gw.clear(1,1,1);
 		gw.setColor(0,0,0);
 		gw.setupForDrawing();
@@ -1226,14 +1237,12 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.enableAlphaBlending();
 
 		drawing.draw( gw );
-
+		
 		gw.setCoordinateSystemToPixels();
 
 		for ( int j = 0; j < Constant.NUM_USERS; ++j ) {
 			userContexts[j].draw(gw);
 		}
-
-
 		// Draw some text to indicate the number of fingers touching the user interface.
 		// This is useful for debugging.
 		int totalNumCursors = 0;
