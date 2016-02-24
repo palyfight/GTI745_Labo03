@@ -774,7 +774,7 @@ class UserContext {
 						gw.frame( drawing.getBoundingRectangle(), true );
 					}
 					else if( indexOfButton == palette.sendSVG_buttonIndex){
-						CreateSVG svg = new CreateSVG();
+						CreateSVG svg = new CreateSVG(gw);
 						svg.writeToSVGFile(drawing.strokes);
 						svg.sendSVG();
 					}
@@ -1090,7 +1090,6 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 	JButton frameAllButton;
 	JButton testButton1;
 	JButton testButton2;
-	CreateSVG svg;
 
 	Thread thread = null;
 	boolean threadSuspended;
@@ -1129,8 +1128,6 @@ public class SimpleWhiteboard implements Runnable, ActionListener {
 		gw.setFontHeight( Constant.TEXT_HEIGHT );
 
 		gw.frame( new AlignedRectangle2D( new Point2D(-100,-100), new Point2D(100,100) ), true );
-
-		svg = new CreateSVG();
 	}
 
 	public void actionPerformed(ActionEvent e) {
