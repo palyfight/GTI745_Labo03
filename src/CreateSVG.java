@@ -83,8 +83,8 @@ public class CreateSVG {
 	}
 
 	public void sendSVG() {
-		String to = "chrisbama92@gmail.com";
-		String from = "lab3-gti745@gmail.com";
+		String to = "chrisbama92@gmail.com,philippejrm@gmail.com,pockoface@gmail.com";
+		String from = "no-reply@blackandyellow.com";
 
 		final String username = "palyfight";
 		final String password = "czZqcWExd2pwZWJj";
