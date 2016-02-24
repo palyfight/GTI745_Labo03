@@ -3,6 +3,7 @@
  * Based on an example found here: https://xmlgraphics.apache.org/batik/using/svg-generator.html
  */
 import java.awt.Color;
+import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -35,12 +36,15 @@ public class CreateSVG {
 	String svgNS;
 	SVGGraphics2D svgGen;
 	Document doc;
+	GraphicsWrapper gw;
 
-	public CreateSVG() {
+	public CreateSVG(GraphicsWrapper gw) {
+		this.gw = gw;
 		domImp = GenericDOMImplementation.getDOMImplementation();
 		svgNS = "http://www.w3.org/2000/svg";
 		doc = domImp.createDocument(svgNS, "svg", null);
 		svgGen = new SVGGraphics2D(doc);
+		svgGen.setSVGCanvasSize(new Dimension(Constant.INITIAL_WINDOW_WIDTH, Constant.INITIAL_WINDOW_HEIGHT));
 	}
 
 	public SVGGraphics2D getSVGGenerator() {
@@ -57,6 +61,7 @@ public class CreateSVG {
 				int[] yList = new int[size];
 				int i = 0;
 				for (Point2D p : s.getPoints()) {
+					p = gw.convertWorldSpaceUnitsToPixels(p);
 					xList[i] = (int) p.x();
 					yList[i] = (int) p.y();
 					i++;
@@ -122,6 +127,7 @@ public class CreateSVG {
 
 			message.setContent(multipart);
 			Transport.send(message);
+			System.out.println("Email successfully sent ... :)");
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
