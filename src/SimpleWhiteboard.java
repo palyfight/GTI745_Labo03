@@ -550,8 +550,6 @@ class Palette {
 class UserContext {
 	private Palette palette = new Palette();
 	private CursorContainer cursorContainer = new CursorContainer();
-	private Stack<Drawing.Memento> doStack = new Stack<Drawing.Memento>();
-	private Stack<Drawing.Memento> undoStack = new Stack<Drawing.Memento>();
 	private Drawing drawing = null;
 
 	private ArrayList< Stroke > selectedStrokes = new ArrayList< Stroke >();
@@ -787,17 +785,17 @@ class UserContext {
 						this.palette.width = Constant.BUTTON_WIDTH * 7;
 					}
 					else if( indexOfButton == palette.undo_buttonIndex){
-						if(!doStack.isEmpty()){
-							Drawing.Memento state = doStack.pop();
+						if(!Constant.doStack.isEmpty()){
+							Drawing.Memento state = Constant.doStack.pop();
 							drawing.undo(state);
-							undoStack.push(state);
+							Constant.undoStack.push(state);
 						}
 					}
 					else if(indexOfButton == palette.redo_buttonIndex){
-						if(!undoStack.isEmpty()){
-							Drawing.Memento state = undoStack.pop();
+						if(!Constant.undoStack.isEmpty()){
+							Drawing.Memento state = Constant.undoStack.pop();
 							drawing.undo(state);
-							doStack.push(state);
+							Constant.doStack.push(state);
 						}
 					}
 					else {
@@ -939,12 +937,12 @@ class UserContext {
 						newStroke.addPoint( gw.convertPixelsToWorldSpaceUnits( p ) );
 					}
 
-					doStack.push(drawing.saveToMemento());
+					Constant.doStack.push(drawing.saveToMemento());
 					drawing.addStroke( newStroke );
-					if(!undoStack.isEmpty()){
-						undoStack.clear();
+					if(!Constant.undoStack.isEmpty()){
+						Constant.undoStack.clear();
 					}
-					undoStack.push(drawing.saveToMemento());
+					Constant.undoStack.push(drawing.saveToMemento());
 					cursorContainer.removeCursorByIndex( cursorIndex );
 				}
 				else {

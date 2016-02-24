@@ -1,4 +1,3 @@
-
 /**
  * Based on an example found here: https://xmlgraphics.apache.org/batik/using/svg-generator.html
  */

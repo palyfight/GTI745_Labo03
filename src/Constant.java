@@ -1,3 +1,4 @@
+import java.util.Stack;
 
 public class Constant {
 	public static final String PROGRAM_NAME = "Simple Whiteboard";
@@ -5,7 +6,8 @@ public class Constant {
 	public static final int INITIAL_WINDOW_HEIGHT = 900; // in pixels
 	public static final boolean HAS_MENUBAR = false; // true;
 	public static final boolean HAS_PANEL_OF_WIDGETS = false; // true;
-
+	public static Stack<Drawing.Memento> doStack = new Stack<Drawing.Memento>();
+	public static Stack<Drawing.Memento> undoStack = new Stack<Drawing.Memento>();
 	public static final int BUTTON_WIDTH = 86; // in pixels
 	public static final int BUTTON_HEIGHT = 60; // in pixels
 
