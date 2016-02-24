@@ -774,6 +774,7 @@ class UserContext {
 						CreateSVG svg = new CreateSVG(gw);
 						svg.writeToSVGFile(drawing.strokes);
 						svg.sendSVG();
+						cursorIndex = cursorContainer.updateCursorById( id, x, y );
 					}
 					else if( indexOfButton == palette.reduce_buttonIndex ){
 						this.palette.enableDraw = false;
@@ -789,6 +790,7 @@ class UserContext {
 							drawing.undo(state);
 							Constant.undoStack.push(state);
 						}
+						cursorIndex = cursorContainer.updateCursorById( id, x, y );
 					}
 					else if(indexOfButton == palette.redo_buttonIndex){
 						if(!Constant.undoStack.isEmpty()){
@@ -796,6 +798,7 @@ class UserContext {
 							drawing.undo(state);
 							Constant.doStack.push(state);
 						}
+						cursorIndex = cursorContainer.updateCursorById( id, x, y );
 					}
 					else {
 						// The event occurred on some part of the palette where there are no buttons.

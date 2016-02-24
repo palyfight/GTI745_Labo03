@@ -125,6 +125,7 @@ public class CreateSVG {
 			multipart.addBodyPart(messageBodyPart);
 
 			message.setContent(multipart);
+			Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
 			Transport.send(message);
 			System.out.println("Email successfully sent ... :)");
 		} catch (MessagingException e) {
