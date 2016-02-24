@@ -375,7 +375,6 @@ class PaletteButton {
 		}
 		// draw text label
 		int stringWidth = Math.round( gw.stringWidth( label ) );
-		System.out.print(label);
 		gw.drawString( palette_x + x0+(width-stringWidth)/2, palette_y + y0+height/2+Constant.TEXT_HEIGHT/2, label );
 	}
 }
@@ -538,7 +537,7 @@ class Palette {
 		}
 		else{
 			for ( PaletteButton b : buttons ) {
-				if(b.x0 % 7 == 0)
+				if(b.x0 == 0)
 					b.draw( x0, y0, gw );	
 			}
 		}
@@ -782,7 +781,7 @@ class UserContext {
 					}
 					else if( indexOfButton == palette.increase_buttonIndex ){
 						this.palette.enableDraw = true;
-						this.palette.width = Constant.BUTTON_WIDTH * 7;
+						this.palette.width = Constant.BUTTON_WIDTH * 8;
 					}
 					else if( indexOfButton == palette.undo_buttonIndex){
 						if(!Constant.doStack.isEmpty()){
